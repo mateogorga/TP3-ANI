@@ -175,10 +175,19 @@ endfunction
 
 [Volumen1, OD1, DBO1] = Euler(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,x0(1),x0(2),x0(3),1,365);
 
+t= 0:1:365;
 plot(t,OD1);
 hold on;
 plot(t,DBO1);
 xlabel('Tiempo [dias]','fontsize',14);
-ylabel('Concentacion ','fontsize',14);
+ylabel('Concentacion [g/m^3]','fontsize',14);
+legend('OD', 'DBO');
+title('Concentraciones en funcion del tiempo','fontsize',18,'color','blue')
+grid
 
-
+t= 0:1:365;
+plot(t,Volumen1);
+xlabel('Tiempo [dias]','fontsize',14);
+ylabel('Volumen [m^3/dia] ','fontsize',14);
+title('Volumen en funcion del tiempo','fontsize',18,'color','blue')
+grid

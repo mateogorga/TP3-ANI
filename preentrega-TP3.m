@@ -136,18 +136,13 @@ cota0 = 77 + 9/10;
 volumen0 = a(cota0,c);
 
 t = [1:365];
-x0 = [volumen0,0,0];     % Vector de valores iniciales de variables dependientes           
+x0 = [volumen0,ODs,0];     % Vector de valores iniciales de variables dependientes
 Ka = 0.01;       % coeficiente de reaireacion
 ODs = 9;         % concentracion de oxigeno de saturacion
 Kbdo = 0.1;      % coeficiente de biodegradación máximo
 Ko2 = 1.4;       % constante de semisaturacion del oxígeno elevada al cuadrado
 ODe = 2;
 DBOe = 20;
-
-fV = Q_e(i) - Q_s(i);
-fOD = (((Q_e(i)*ODe - Q_s(i)*OD)/V) + (Ka*(ODs - OD)) - (Kbdo*((OD^2)/((OD^2)+(Ko2))))*DBO);
-fBDO = (((Q_e(i)*DBOe - Q_s(i)*DBO)/V) - (Kbdo*((OD^2)/((OD^2)+(Ko2))))*DBO);
-
 
 function [Volumen,OD,DBO] = Euler(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,Vo,ODo,DBOo,h,t)
   Volumen = [];
@@ -169,7 +164,7 @@ function [Volumen,OD,DBO] = Euler(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,Vo,ODo,DBOo,h
     OD(i+1) = od;
     DBO(i+1) = dbo;
     i = i+1;
-    tiempo = tiempo + h
+    tiempo = tiempo + h;
   endwhile
 endfunction
 

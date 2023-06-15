@@ -134,3 +134,51 @@ ylim([0 1000000000])
 
 cota0 = 77 + 9/10;
 volumen0 = a(cota0,c);
+
+t = [1:365];
+x0 = [volumen0,0,0];     % Vector de valores iniciales de variables dependientes           
+Ka = 0.01;       % coeficiente de reaireacion
+ODs = 9;         % concentracion de oxigeno de saturacion
+Kbdo = 0.1;      % coeficiente de biodegradación máximo
+Ko2 = 1.4;       % constante de semisaturacion del oxígeno elevada al cuadrado
+ODe = 2;
+DBOe = 20;
+
+fV = Q_e(i) - Q_s(i);
+fOD = (((Q_e(i)*ODe - Q_s(i)*OD)/V) + (Ka*(ODs - OD)) - (Kbdo*((OD^2)/((OD^2)+(Ko2))))*DBO);
+fBDO = (((Q_e(i)*DBOe - Q_s(i)*DBO)/V) - (Kbdo*((OD^2)/((OD^2)+(Ko2))))*DBO);
+
+
+function [Volumen,OD,DBO] = Euler(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,Vo,ODo,DBOo,h,t)
+  Volumen = [];
+  OD = [];
+  DBO = [];
+  Volumen(1) = Vo;
+  OD(1) = ODo;
+  DBO(1) = DBOo;
+  i = 1;
+  tiempo = 0;
+  while tiempo < t
+    fV(i)= Q_e(i) - Q_s(i);
+    fOD(i) = (((Q_e(i)*ODe - Q_s(i)*OD(i))/Volumen(i)) + (Ka*(ODs - OD(i))) - (Kbdo*((OD(i)^2)/((OD(i)^2)+(Ko2))))*DBO(i));
+    fDBO(i) = (((Q_e(i)*DBOe - Q_s(i)*DBO(i))/Volumen(i)) - (Kbdo*((OD(i)^2)/((OD(i)^2)+(Ko2))))*DBO(i));
+    V = Volumen(i) + h*fV(i);
+    od = OD(i) + h*fOD(i);
+    dbo = DBO(i) + h*fDBO(i);
+    Volumen(i+1) = V;
+    OD(i+1) = od;
+    DBO(i+1) = dbo;
+    i = i+1;
+    tiempo = tiempo + h
+  endwhile
+endfunction
+
+[Volumen1, OD1, DBO1] = Euler(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,x0(1),x0(2),x0(3),1,365);
+
+plot(t,OD1);
+hold on;
+plot(t,DBO1);
+xlabel('Tiempo [dias]','fontsize',14);
+ylabel('Concentacion ','fontsize',14);
+
+

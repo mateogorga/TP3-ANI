@@ -6,67 +6,10 @@ KO = 1.4;     #[g^2/m^6] #valor correspondiente a KO2^2
 DBOe = 20;    #[g/m^3]
 ODe = 2;      #[g/m^3]
 ODs = 9;      #[g/m^3]
+datos_caudales = dlmread('datos_Q.csv',",");
 
-f = 86400;    #factor de conversion de m^3/s a m^3/dia
-Q_e = [];     #[m^3/dia]
-for i = 1:365
-  if i<=31
-    Q_e(i) = 6;
-  elseif 31<i && i<=59
-    Q_e(i) = 9;
-  elseif 59<i && i<=90
-    Q_e(i) = 12;
-  elseif 90<i && i<=120
-    Q_e(i) = 15;
-  elseif 120<i && i<=151
-    Q_e(i) = 19;
-  elseif 151<i && i<=181
-    Q_e(i) = 25;
-  elseif 181<i && i<=212
-    Q_e(i) = 25;
-  elseif 212<i && i<=243
-    Q_e(i) = 18;
-  elseif 243<i && i<=273
-    Q_e(i) = 14;
-  elseif 273<i && i<=304
-    Q_e(i) = 10;
-  elseif 304<i && i<=334
-    Q_e(i) = 7;
-  else
-    Q_e(i) = 6;
-    endif
-endfor
-Q_e = f* Q_e
-
-Q_s = [];
-for i = 1:365
-  if i<=31
-    Q_s(i) = 0;
-  elseif 31<i && i<=59
-    Q_s(i) = 0;
-  elseif 59<i && i<=90
-    Q_s(i) = 12;
-  elseif 90<i && i<=120
-    Q_s(i) = 15;
-  elseif 120<i && i<=151
-    Q_s(i) = 19;
-  elseif 151<i && i<=181
-    Q_s(i) = 44;
-  elseif 181<i && i<=212
-    Q_s(i) = 34;
-  elseif 212<i && i<=243
-    Q_s(i) = 18;
-  elseif 243<i && i<=273
-    Q_s(i) = 14;
-  elseif 273<i && i<=304
-    Q_s(i) = 10;
-  elseif 304<i && i<=334
-    Q_s(i) = 0;
-  else
-    Q_s(i) = 0;
-    endif
-endfor
-Q_s = f* Q_s;
+Q_e = datos_caudales(:,2);  #[m^3/dia]
+Q_s = datos_caudales(:,3);  #[m^3/dia]
 
 #EJERCICIO B
 
@@ -135,7 +78,7 @@ ylim([0 1000000000])
 cota0 = 77 + 9/10;
 volumen0 = a(cota0,c);
 
-t = [1:365];
+t = [1:1825];
 x0 = [volumen0,ODs,0];     % Vector de valores iniciales de variables dependientes
 Ka = 0.01;       % coeficiente de reaireacion
 ODs = 9;         % concentracion de oxigeno de saturacion
@@ -143,6 +86,8 @@ Kbdo = 0.1;      % coeficiente de biodegradación máximo
 Ko2 = 1.4;       % constante de semisaturacion del oxígeno elevada al cuadrado
 ODe = 2;
 DBOe = 20;
+
+#EULER
 
 function [Volumen,OD,DBO] = Euler(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,Vo,ODo,DBOo,h,t)
   Volumen = [];
@@ -168,9 +113,9 @@ function [Volumen,OD,DBO] = Euler(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,Vo,ODo,DBOo,h
   endwhile
 endfunction
 
-[Volumen1, OD1, DBO1] = Euler(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,x0(1),x0(2),x0(3),1,365);
+[Volumen1, OD1, DBO1] = Euler(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,x0(1),x0(2),x0(3),1,1825);
 
-t= 0:1:365;
+t= 0:1:1825;
 plot(t,OD1);
 hold on;
 plot(t,DBO1);
@@ -180,7 +125,7 @@ legend('OD', 'DBO');
 title('Concentraciones en funcion del tiempo','fontsize',18,'color','blue')
 grid
 
-t= 0:1:365;
+t= 0:1:1825;
 plot(t,Volumen1);
 xlabel('Tiempo [dias]','fontsize',14);
 ylabel('Volumen [m^3/dia] ','fontsize',14);

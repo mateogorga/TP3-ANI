@@ -135,3 +135,59 @@ ylabel('Volumen [m^3/dia] ','fontsize',14);
 title('Volumen en funcion del tiempo','fontsize',18,'color','blue')
 grid
 xlim([365 1825])
+
+#RUNGE-KUTTA
+
+function [Volumen,OD,DBO] = RungeKutta(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,Vo,ODo,DBOo,h,t)
+  Volumen = [];
+  OD = [];
+  DBO = [];
+  Volumen(1) = Vo;
+  OD(1) = ODo;
+  DBO(1) = DBOo;
+  i = 1;
+  tiempo = 0;
+
+  while tiempo < t-1
+    fV(i)= Q_e(i) - Q_s(i);
+    q1v(i)= h*fV(i);
+    q2v(i)= h*(fV(i) + q1v(i));
+    V = Volumen(i) + 0.5 * (q1v(i) + q2v(i));
+    Volumen(i+1) = V;
+
+    fOD(i) = (((Q_e(i)*ODe - Q_s(i)*OD(i))/Volumen(i)) + (Ka*(ODs - OD(i))) - (Kbdo*((OD(i)^2)/((OD(i)^2)+(Ko2))))*DBO(i));
+    fDBO(i) = (((Q_e(i)*DBOe - Q_s(i)*DBO(i))/Volumen(i)) - (Kbdo*((OD(i)^2)/((OD(i)^2)+(Ko2))))*DBO(i));
+    q1od(i) = h*fOD(i);
+    q1dbo(i) = h*fDBO(i);
+    fOD(i+1) = (((Q_e(i)*ODe - Q_s(i)*(OD(i)+q1od(i))/(Volumen(i)+q1v(i)) + (Ka*(ODs - (OD(i)+ q1od(i))) - (Kbdo*((OD(i)+q1od(i))^2)/((OD(i)+q1od(i))^2)+(Ko2))))*(DBO(i)+q1dbo(i));
+    fDBO(i+1) = (((Q_e(i+1)*DBOe - Q_s(i+1)*(DBO(i)+q1dbo(i)))/(Volumen(i)+q1v(i)) - (Kbdo*(OD(i)+q1od(i))^2)/((OD(i)+q1od(i))^2)+(Ko2))))*(DBO(i)+q1dbo(i)));
+    q2od(i) = h*(fOD(i+1)+q1od(i));
+    q2dbo(i) = h*(fDBO(i+1)+q1dbo(i));
+    OD = OD(i) + 0.5*(q1od(i)+q2od(i));
+    DBO = DBO(i) + 0.5*(q1dbo(i)+q2dbo(i));
+    OD(i+1) = OD;
+    DBO(i+1) = DBO;
+
+    i = i+1;
+    tiempo = tiempo + h;
+  endwhile
+endfunction
+
+[Volumen2, OD2, DBO2] = RungeKutta(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,x0(1),x0(2),x0(3),1,365);
+
+t= 0:1:365;
+plot(t,Volumen2);
+xlabel('Tiempo [dias]','fontsize',14);
+ylabel('Volumen [m^3/dia] ','fontsize',14);
+title('Volumen en funcion del tiempo','fontsize',18,'color','blue')
+grid
+
+t= 0:1:365;
+plot(t,OD2);
+hold on;
+plot(t,DBO2);
+xlabel('Tiempo [dias]','fontsize',14);
+ylabel('Concentacion [g/m^3]','fontsize',14);
+legend('OD', 'DBO');
+title('Concentraciones en funcion del tiempo','fontsize',18,'color','blue')
+grid

@@ -64,8 +64,8 @@ plot(x,l(x, Cota,produ_denominadores_delta, Volumen))
 hold on;
 scatter(Cota, Volumen,20, 'filled')
 hold off;
-le = legend('Ajuste por Cuadrados Minimos', 'Interpolacion por Lagrange')
-set(le,'fontsize', 16)
+leyenda0 = legend('Ajuste por Cuadrados Minimos', 'Interpolacion por Lagrange')
+set(leyenda,'fontsize', 16)
 xlabel('Cota [m]','fontsize',14)
 ylabel('Volumen [m^3]','fontsize',14)
 title('Curvas Volumen-Cota','fontsize',18,'color','blue')
@@ -124,6 +124,9 @@ ylabel('Concentacion [g/m^3]','fontsize',14);
 legend('OD', 'DBO');
 title('Concentraciones en funcion del tiempo','fontsize',18,'color','blue')
 grid
+xlim([365 1825])
+leyenda1 = legend('OD', 'DBO')
+set(leyenda1,'fontsize', 20)
 
 t= 0:1:1825;
 plot(t,Volumen1);
@@ -131,3 +134,4 @@ xlabel('Tiempo [dias]','fontsize',14);
 ylabel('Volumen [m^3/dia] ','fontsize',14);
 title('Volumen en funcion del tiempo','fontsize',18,'color','blue')
 grid
+xlim([365 1825])

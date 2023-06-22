@@ -97,7 +97,7 @@ function [Volumen,OD,DBO] = Euler(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,Vo,ODo,DBOo,h
   OD(1) = ODo;
   DBO(1) = DBOo;
   i = 1;
-  tiempo = 0;
+  tiempo = h;
   while tiempo < t
     fV(i)= Q_e(i) - Q_s(i);
     fOD(i) = (((Q_e(i)*ODe - Q_s(i)*OD(i))/Volumen(i)) + (Ka*(ODs - OD(i))) - (Kbdo*((OD(i)^2)/((OD(i)^2)+(Ko2))))*DBO(i));
@@ -113,32 +113,28 @@ function [Volumen,OD,DBO] = Euler(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,Vo,ODo,DBOo,h
   endwhile
 endfunction
 
-[Volumen1, OD1, DBO1] = Euler(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,x0(1),x0(2),x0(3),1,1825);
+[Volumen1, OD1, DBO1] = Euler(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,x0(1),x0(2),x0(3),1,365);
 
-t= 0:1:1825;
+t= 0:1:364;
 plot(t,OD1);
 hold on;
 plot(t,DBO1);
 xlabel('Tiempo [dias]','fontsize',14);
-ylabel('Concentacion [g/m^3]','fontsize',14);
+ylabel('Concentracion [g/m^3]','fontsize',14);
 legend('OD', 'DBO');
 title('Concentraciones en funcion del tiempo','fontsize',18,'color','blue')
 grid
-xlim([365 1825])
-leyenda1 = legend('OD', 'DBO')
-set(leyenda1,'fontsize', 20)
 
-t= 0:1:1825;
+t= 0:1:364;
 plot(t,Volumen1);
 xlabel('Tiempo [dias]','fontsize',14);
 ylabel('Volumen [m^3/dia] ','fontsize',14);
 title('Volumen en funcion del tiempo','fontsize',18,'color','blue')
 grid
-xlim([365 1825])
 
 #RUNGE-KUTTA
 
-function [Volumen,OD,DBO] = RungeKutta(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,Vo,ODo,DBOo,h,t)
+function [Volumen,OD,DBO] = Rungekutta(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,Vo,ODo,DBOo,h,t)
   Volumen = [];
   OD = [];
   DBO = [];
@@ -146,9 +142,9 @@ function [Volumen,OD,DBO] = RungeKutta(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,Vo,ODo,D
   OD(1) = ODo;
   DBO(1) = DBOo;
   i = 1;
-  tiempo = 0;
+  tiempo = h;
 
-  while tiempo < t-1
+  while tiempo < t
     fV(i)= Q_e(i) - Q_s(i);
     q1v(i)= h*fV(i);
     q2v(i)= h*(fV(i) + q1v(i));
@@ -173,7 +169,7 @@ function [Volumen,OD,DBO] = RungeKutta(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,Vo,ODo,D
   endwhile
 endfunction
 
-[Volumen2, OD2, DBO2] = RungeKutta(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,x0(1),x0(2),x0(3),1,365);
+[Volumen2, OD2, DBO2] = Rungekutta(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,x0(1),x0(2),x0(3),1,365);
 
 t= 0:1:365;
 plot(t,Volumen2);
@@ -191,3 +187,116 @@ ylabel('Concentacion [g/m^3]','fontsize',14);
 legend('OD', 'DBO');
 title('Concentraciones en funcion del tiempo','fontsize',18,'color','blue')
 grid
+
+#item d
+
+Q_e1 = Q_e;
+j = 1;
+i = 1;
+while j <= 365
+  Q_e1(i) = Q_e(j);
+  i = i+1;
+  Q_e1(i) = Q_e(j);
+  j = j+1;
+  i = i+1;
+endwhile
+
+Q_s1 = Q_s;
+j = 1;
+i = 1;
+while j <= 365
+  Q_s1(i) = Q_s(j);
+  i = i+1;
+  Q_s1(i) = Q_s(j);
+  j = j+1;
+  i = i+1;
+endwhile
+
+
+[Volumen3, OD3, DBO3] = Euler(Q_e1,Q_s1,Ka,ODs,Kbdo,Ko2,ODe,DBOe,x0(1),x0(2),x0(3),0.5,365);
+
+t = 0:0.5:364.5;
+plot(t,OD3);
+hold on;
+plot(t,DBO3);
+
+#Calculo el error de truncamiento con Euler
+Error_OD = [];
+Error_DBO = [];
+i = 1;
+j = 2;
+while i <= 365
+  Error_OD(i) = abs(OD1(i) - OD3(j));
+  Error_DBO(i) = abs(DBO1(i) - DBO3(j));
+  i = i+1;
+  j = j+2;
+endwhile
+
+plot(Error_OD);
+plot(Error_DBO);  
+
+#Calculo el error de truncamiento con Runge Kutta
+[Volumen4, OD4, DBO4] = Rungekutta(Q_e1,Q_s1,Ka,ODs,Kbdo,Ko2,ODe,DBOe,x0(1),x0(2),x0(3),0.5,365);
+
+t = 0:0.5:364.5;
+plot(t,OD4);
+hold on;
+plot(t,DBO4);
+
+
+Error_OD_RK = [];
+Error_DBO_RK = [];
+i = 1;
+j = 2;
+while i <= 365
+  Error_OD_RK(i) = abs(OD2(i) - OD4(j));
+  Error_DBO_RK(i) = abs(DBO2(i) - DBO4(j));
+  i = i+1;
+  j = j+2;
+endwhile
+
+plot(Error_OD_RK);
+plot(Error_DBO_RK); 
+
+  
+#Item f
+
+[Volumen5, OD5, DBO5] = Euler(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,x0(1),x0(2),x0(3),7,364);
+
+t = 0:7:357;
+plot(t,OD5);
+hold on;
+plot(t,DBO5);
+
+#Calculo el error de truncamiento con Euler
+Error_OD5 = [];
+Error_DBO5 = [];
+i = 1;
+j = 14;
+while i <= 52
+  Error_OD5(i) = abs(OD5(i) - OD3(j));
+  Error_DBO5(i) = abs(DBO5(i) - DBO3(j));
+  i = i+1;
+  j = j+14;
+endwhile
+
+plot(Error_OD5);
+plot(Error_DBO5);  
+
+
+#Calculo el error de truncamiento con Runge Kutta
+[Volumen6, OD6, DBO6] = Rungekutta(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,x0(1),x0(2),x0(3),7,364);
+
+Error_OD_RK6 = [];
+Error_DBO_RK6 = [];
+i = 1;
+j = 14;
+while i <= 52
+  Error_OD_RK6(i) = abs(OD6(i) - OD4(j));
+  Error_DBO_RK6(i) = abs(DBO6(i) - DBO4(j));
+  i = i+1;
+  j = j+14;
+endwhile
+
+plot(Error_OD_RK6);
+plot(Error_DBO_RK6); 

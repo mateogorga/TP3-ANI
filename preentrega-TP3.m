@@ -171,14 +171,14 @@ endfunction
 
 [Volumen2, OD2, DBO2] = Rungekutta(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,x0(1),x0(2),x0(3),1,365);
 
-t= 0:1:365;
+t= 0:1:364;
 plot(t,Volumen2);
 xlabel('Tiempo [dias]','fontsize',14);
 ylabel('Volumen [m^3/dia] ','fontsize',14);
 title('Volumen en funcion del tiempo','fontsize',18,'color','blue')
 grid
 
-t= 0:1:365;
+t= 0:1:364;
 plot(t,OD2);
 hold on;
 plot(t,DBO2);
@@ -188,7 +188,7 @@ legend('OD', 'DBO');
 title('Concentraciones en funcion del tiempo','fontsize',18,'color','blue')
 grid
 
-#item d
+#EJERCICIO D
 
 Q_e1 = Q_e;
 j = 1;
@@ -212,7 +212,6 @@ while j <= 365
   i = i+1;
 endwhile
 
-
 [Volumen3, OD3, DBO3] = Euler(Q_e1,Q_s1,Ka,ODs,Kbdo,Ko2,ODe,DBOe,x0(1),x0(2),x0(3),0.5,365);
 
 t = 0:0.5:364.5;
@@ -220,22 +219,6 @@ plot(t,OD3);
 hold on;
 plot(t,DBO3);
 
-#Calculo el error de truncamiento con Euler
-Error_OD = [];
-Error_DBO = [];
-i = 1;
-j = 2;
-while i <= 365
-  Error_OD(i) = abs(OD1(i) - OD3(j));
-  Error_DBO(i) = abs(DBO1(i) - DBO3(j));
-  i = i+1;
-  j = j+2;
-endwhile
-
-plot(Error_OD);
-plot(Error_DBO);  
-
-#Calculo el error de truncamiento con Runge Kutta
 [Volumen4, OD4, DBO4] = Rungekutta(Q_e1,Q_s1,Ka,ODs,Kbdo,Ko2,ODe,DBOe,x0(1),x0(2),x0(3),0.5,365);
 
 t = 0:0.5:364.5;
@@ -243,6 +226,19 @@ plot(t,OD4);
 hold on;
 plot(t,DBO4);
 
+#Calculo el error de truncamiento con Euler
+Error_OD = [];
+Error_DBO = [];
+i = 1;
+j = 2;
+while i <= 365
+  Error_OD(i) = abs(OD1(i) - OD4(j));
+  Error_DBO(i) = abs(DBO1(i) - DBO4(j));
+  i = i+1;
+  j = j+2;
+endwhile
+
+#Calculo el error de truncamiento con Runge Kutta
 
 Error_OD_RK = [];
 Error_DBO_RK = [];
@@ -255,11 +251,34 @@ while i <= 365
   j = j+2;
 endwhile
 
+#Error de OD con ambos metodos
+plot(Error_OD);
+xlabel('Tiempo [dias]','fontsize',14);
+ylabel('Error','fontsize',14);
+title('Errores de OD en funcion del tiempo','fontsize',18,'color','blue')
+grid
+hold on;
 plot(Error_OD_RK);
-plot(Error_DBO_RK); 
+xlabel('Tiempo [dias]','fontsize',14);
+ylabel('Error','fontsize',14);
+leyenda2 = legend('Euler', 'Runge-Kutta')
+set(leyenda2,'fontsize', 20)
+grid
 
-  
-#Item f
+plot(Error_DBO);
+xlabel('Tiempo [dias]','fontsize',14);
+ylabel('Error','fontsize',14);
+title('Error de DBO en funcion del tiempo','fontsize',18,'color','blue')
+grid
+hold on;
+plot(Error_DBO_RK);
+xlabel('Tiempo [dias]','fontsize',14);
+ylabel('Error','fontsize',14);
+leyenda2 = legend('Euler', 'Runge-Kutta')
+set(leyenda2,'fontsize', 20)
+grid
+
+#EJERCICIO F
 
 [Volumen5, OD5, DBO5] = Euler(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,x0(1),x0(2),x0(3),7,364);
 
@@ -281,8 +300,7 @@ while i <= 52
 endwhile
 
 plot(Error_OD5);
-plot(Error_DBO5);  
-
+plot(Error_DBO5);
 
 #Calculo el error de truncamiento con Runge Kutta
 [Volumen6, OD6, DBO6] = Rungekutta(Q_e,Q_s,Ka,ODs,Kbdo,Ko2,ODe,DBOe,x0(1),x0(2),x0(3),7,364);
@@ -299,4 +317,4 @@ while i <= 52
 endwhile
 
 plot(Error_OD_RK6);
-plot(Error_DBO_RK6); 
+plot(Error_DBO_RK6);
